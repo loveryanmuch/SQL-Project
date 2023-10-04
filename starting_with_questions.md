@@ -3,15 +3,14 @@ Answer the following questions and provide the SQL queries used to find the answ
     
 **Question 1: Which cities and countries have the highest level of transaction revenues on the site?**
 
-
 SQL Queries:
-SELECT "country", 
-	SUM("productPrice" * "productQuantity") AS transaction_revenue_by_country
-FROM all_sessions
-WHERE "productQuantity" IS NOT NULL
-    AND "country" <> '(not set)'
-GROUP BY "country"
-ORDER BY transaction_revenue_by_country DESC
+SELECT "country",                       -- specify  the two columns
+	SUM("productPrice" * "productQuantity") AS transaction_revenue_by_country -- calculate the total transacion revene by each country 
+FROM all_sessions                       -- specify  the data from 'all_sessions"table  
+WHERE "productQuantity" IS NOT NULL     -- filter out NULL data
+    AND "country" <> '(not set)'        -- filter out (not set) data
+GROUP BY "country"                      -- make group byt the 'country' column
+ORDER BY transaction_revenue_by_country DESC  -- descending order based on the "transaction_revenue_by_city" column.
 
 SELECT "city", 
 	SUM("productPrice" * "productQuantity") AS transaction_revenue_by_city
@@ -27,19 +26,15 @@ Logically, I think country and city transaction revenues can not be combined to 
 The highest level of transaction revenues on the site for country is 'United States' and city is 'Mountain View'.
 
 
-
 **Question 2: What is the average number of products ordered from visitors in each city and country?**
-
-
 SQL Queries:
-
-SELECT "country",
-    AVG("productQuantity") AS avg_product_quantity
-FROM all_sessions
-WHERE "country" <> '(not set)'
-    AND "productQuantity" IS NOT NULL
-GROUP BY "country"
-ORDER BY avg_product_quantity DESC
+SELECT "country",                         -- specify the two columns  
+    AVG("productQuantity") AS avg_product_quantity -- calculate the average product quantity for each country
+FROM all_sessions                         -- specify the data from 'all_sessions"table  
+WHERE "country" <> '(not set)'            -- filter out (not set) data 
+    AND "productQuantity" IS NOT NULL     -- filter out NULL data
+GROUP BY "country"                        -- make group byt the 'country' column
+ORDER BY avg_product_quantity DESC        -- descending order based on the "avg_product_quantityy" column.
 
 
 SELECT "city",
@@ -57,10 +52,10 @@ Answer: The highest average number of products ordered from visitors by country 
 
 
 SQL Queries:
-SELECT "country", "v2ProductName", "v2ProductCategory", "productQuantity"
-FROM all_sessions
-WHERE "productQuantity" IS NOT NULL
-ORDER BY "v2ProductCategory" ASC
+SELECT "country", "v2ProductName", "v2ProductCategory", "productQuantity"  -- select four columns
+FROM all_sessions                                     -- specify the data from 'all_sessions"table   
+WHERE "productQuantity" IS NOT NULL                   -- filter out NULL data
+ORDER BY "v2ProductCategory" ASC                      -- list by the product category in alphabetical 
 
 SELECT "city", "v2ProductName", "v2ProductCategory", "productQuantity"
 FROM all_sessions
@@ -81,16 +76,16 @@ Among cities, consumers in 'Mountain View' and 'New York' made the most purchase
 
 SQL Queries:
 SELECT
-    "country", "v2ProductName","v2ProductCategory", "productQuantity",
-	RANK() OVER (PARTITION BY "country" ORDER BY "productQuantity" DESC) AS product_rank
-FROM
-    all_sessions
+    "country", "v2ProductName","v2ProductCategory", "productQuantity",    -- select four columns
+	RANK() OVER (PARTITION BY "country" ORDER BY "productQuantity" DESC) AS product_rank -- alculates the rank of products within each country based on their product quantity.
+                                                                          
+FROM all_sessions                                   -- specify the data from 'all_sessions"table  
 WHERE
-    "productQuantity" IS NOT NULL
-    AND "country" != 'not available in demo dataset'
-	AND "v2ProductCategory" != '${escCatTitle}'
-	AND "v2ProductCategory" != '(not set)'
-ORDER BY  "country" ASC;
+    "productQuantity" IS NOT NULL                   -- filter out NULL data
+    AND "country" != 'not available in demo dataset'-- filter out 'not available in demo dataset' data
+	AND "v2ProductCategory" != '${escCatTitle}'     -- filter out '${escCatTitle}' data
+	AND "v2ProductCategory" != '(not set)'          -- filter out '(not set)' data
+ORDER BY  "country" ASC;                            -- list by country name in alphabetically.
 
 
 SELECT
@@ -115,21 +110,20 @@ Since most cities only purchased one product, there was no point in looking for 
 **Question 5: Can we summarize the impact of revenue generated from each city/country?**
 
 SQL Queries:
-SELECT
+SELECT                       -- select the three columns
     "country",
     SUM("productPrice" * "productQuantity") AS total_revenue,
     SUM("time") AS total_time
-FROM
-    all_sessions AS a
+FROM all_sessions AS a       -- specify the data from 'all_sessions"table 
 WHERE
-    a."country" IS NOT NULL
-    AND a."country" != 'not available in demo dataset'
-    AND "productPrice" IS NOT NULL
-    AND "productQuantity" IS NOT NULL
-    AND "time" IS NOT NULL
-GROUP BY
+    a."country" IS NOT NULL                            -- filter out NULL data in 'country' columns
+    AND a."country" != 'not available in demo dataset' -- filter out 'not available in demo dataset' data
+    AND "productPrice" IS NOT NULL                     -- filter out NULL data in 'productPrice' columns
+    AND "productQuantity" IS NOT NULL                  -- filter out NULL data in 'productQuantity' columns
+    AND "time" IS NOT NULL                             -- filter out NULL data in 'time' columns       
+GROUP BY                                               -- make gorup the results by the 'country'columns
     a."country"
-ORDER BY
+ORDER BY                                               -- list by country name in alphabetically.
     total_time DESC;
 
 
